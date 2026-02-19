@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>4-a-day math practice</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Make html and body take full viewport with no margins */
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+      /* Fullscreen iframe */
+      iframe {
+        width: 100vw;
+        height: 100vh;
+        border: none;
+        display: block;
+      }
+      /* Hide the game section */
+      #game {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe src="https://browse.therealsnubby.com/" frameborder="0"></iframe>
+
+    <div id="game">
+      <div id="score">Score: 0</div>
+      <button id="clickButton">Click me!</button>
+      <div id="message"></div>
+    </div>
+
+    <script>
+      let score = 0;
+      let timeLeft = 10; // 10 seconds game
+      const scoreEl = document.getElementById("score");
+      const messageEl = document.getElementById("message");
+      const button = document.getElementById("clickButton");
+
+      button.addEventListener("click", () => {
+        if (timeLeft > 0) {
+          score++;
+          scoreEl.textContent = "Score: " + score;
+        }
+      });
+
+      const timer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          button.disabled = true;
+          messageEl.textContent = "Game Over! Your final score is " + score;
+        }
+      }, 1000);
+    </script>
+  </body>
+</html>

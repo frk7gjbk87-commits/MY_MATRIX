@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safari</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .browser-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: white;
+        }
+
+        /* TOP BAR - macOS style */
+        .top-bar {
+            height: 37px;
+            background: linear-gradient(to bottom, #ffffff, #f5f5f5);
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 8px;
+            flex-shrink: 0;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+        }
+
+        .traffic-lights {
+            display: flex;
+            gap: 8px;
+            margin-right: 10px;
+        }
+
+        .traffic-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .traffic-light.close {
+            background: #ff5f57;
+        }
+
+        .traffic-light.minimize {
+            background: #febc2e;
+        }
+
+        .traffic-light.maximize {
+            background: #28c940;
+        }
+
+        .traffic-light:hover {
+            transform: scale(1.1);
+        }
+
+        /* TOOLBAR */
+        .browser-toolbar {
+            display: flex;
+            gap: 6px;
+            padding: 8px 12px;
+            background: linear-gradient(to bottom, #ffffff, #fafafa);
+            border-bottom: 1px solid #e0e0e0;
+            align-items: center;
+            height: 48px;
+            flex-shrink: 0;
+        }
+
+        .browser-btn {
+            width: 34px;
+            height: 34px;
+            background: #f0f0f0;
+            border: 1px solid #d4d4d4;
+            color: #333;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+
+        .browser-btn:hover:not(:disabled) {
+            background: #e8e8e8;
+            border-color: #c0c0c0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .browser-btn:active:not(:disabled) {
+            background: #d8d8d8;
+        }
+
+        .browser-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .address-bar-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .address-bar {
+            flex: 1;
+            padding: 8px 14px;
+            background: #f3f3f3;
+            border: 1px solid #d4d4d4;
+            border-radius: 8px;
+            color: #333;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s;
+            height: 34px;
+        }
+
+        .address-bar::placeholder {
+            color: #999;
+        }
+
+        .address-bar:focus {
+            background: white;
+            border-color: #0071e3;
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            color: #999;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        /* HOMEPAGE */
+        .homepage {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+            color: #333;
+            padding: 40px 20px;
+            overflow-y: auto;
+        }
+
+        .homepage h1 {
+            font-size: 56px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .homepage p {
+            font-size: 15px;
+            margin-bottom: 50px;
+            color: #666;
+        }
+
+        .quicklinks-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .quicklinks-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quicklinks {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .quicklink {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 16px;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .quicklink:hover {
+            background: #f9f9f9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            border-color: #d4d4d4;
+        }
+
+        .quicklink-icon {
+            font-size: 32px;
+        }
+
+        .quicklink-text {
+            font-size: 12px;
+            text-align: center;
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* CONTENT AREA */
+        .browser-content {
+            flex: 1;
+            overflow: hidden;
+            background: white;
+            position: relative;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 100;
+        }
+
+        .spinner {
+            border: 3px solid #f0f0f0;
+            border-top: 3px solid #0071e3;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .content-frame {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border: none;
+            overflow: auto;
+        }
+
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 10;
+            max-width: 500px;
+            display: none;
+        }
+
+        .error-message h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .error-message p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .error-message button {
+            padding: 10px 20px;
+            background: #0071e3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .error-message button:hover {
+            background: #0051b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="browser-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="traffic-lights">
+                <div class="traffic-light close"></div>
+                <div class="traffic-light minimize"></div>
+                <div class="traffic-light maximize"></div>
+            </div>
+            <span style="color: #666; font-size: 12px; font-weight: 500;">Safari</span>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="browser-toolbar">
+            <button class="browser-btn" id="back-btn" onclick="goBack()" title="Back">←</button>
+            <button class="browser-btn" id="forward-btn" onclick="goForward()" title="Forward">→</button>
+            <button class="browser-btn" onclick="reloadPage()" title="Reload">↻</button>
+            
+            <div class="address-bar-container">
+                <input type="text" class="address-bar" id="address-bar" placeholder="Search or enter website" onkeypress="handleKeyPress(event)">
+                <span class="search-icon">🔍</span>
+            </div>
+
+            <button class="browser-btn" onclick="openSettings()" title="Settings">⋯</button>
+        </div>
+
+        <!-- Homepage -->
+        <div id="homepage" class="homepage">
+            <h1>Safari</h1>
+            <p>Your privacy is our priority</p>
+            
+            <div class="quicklinks-section">
+                <div class="quicklinks-title">Favorites</div>
+                <div class="quicklinks">
+                    <div class="quicklink" onclick="navigateTo('google.com')">
+                        <div class="quicklink-icon">🔍</div>
+                        <div class="quicklink-text">Google</div>
+                    </div>
+                    <div class="quicklink" onclick="navigateTo('github.com')">
+                        <div class="quicklink-icon">🐙</div>
+                        <div class="quicklink-text">GitHub</div>
+                    </div>
+                    <div class="quicklink" onclick="navigateTo('youtube.com')">
+                        <div class="quicklink-icon">▶️</div>
+                        <div class="quicklink-text">YouTube</div>
+                    </div>
+                    <div class="quicklink" onclick="navigateTo('twitter.com')">
+                        <div class="quicklink-icon">𝕏</div>
+                        <div class="quicklink-text">X</div>
+                    </div>
+                    <div class="quicklink" onclick="navigateTo('reddit.com')">
+                        <div class="quicklink-icon">🤖</div>
+                        <div class="quicklink-text">Reddit</div>
+                    </div>
+                    <div class="quicklink" onclick="navigateTo('wikipedia.org')">
+                        <div class="quicklink-icon">📖</div>
+                        <div class="quicklink-text">Wikipedia</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div id="browser-content" class="browser-content">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+            <pre id="content-frame" class="content-frame" style="display: none; padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; color: #333;"></pre>
+            <div id="error-msg" class="error-message">
+                <h2>Oops!</h2>
+                <p id="error-text">Unable to load this page. Please check the URL and try again.</p>
+                <button onclick="goHome()">Go Home</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const addressBar = document.getElementById('address-bar');
+        const backBtn = document.getElementById('back-btn');
+        const forwardBtn = document.getElementById('forward-btn');
+        const contentFrame = document.getElementById('content-frame');
+        const homepage = document.getElementById('homepage');
+        const errorMsg = document.getElementById('error-msg');
+        const loadingSpinner = document.querySelector('.loading-spinner');
+        
+        let browserHistory = [];
+        let currentHistoryIndex = -1;
+
+        // Local proxy server endpoint
+        const PROXY_URL = 'http://localhost:3000/api/proxy?url=';
+
+        function formatURL(url) {
+            if (!url) return '';
+            
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                if (url.includes('.') && !url.includes(' ')) {
+                    return 'https://' + url;
+                } else {
+                    return 'https://www.google.com/search?q=' + encodeURIComponent(url);
+                }
+            }
+            return url;
+        }
+
+        async function navigateTo(url) {
+            url = formatURL(url);
+            if (!url) return;
+
+            showLoading(true);
+            
+            try {
+                const proxyEndpoint = PROXY_URL + encodeURIComponent(url);
+                const response = await fetch(proxyEndpoint);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Unknown error');
+                }
+
+                currentHistoryIndex++;
+                browserHistory = browserHistory.slice(0, currentHistoryIndex);
+                browserHistory.push(url);
+                
+                addressBar.value = url;
+                displayContent(data.content);
+                updateNavigationButtons();
+                
+                homepage.style.display = 'none';
+                contentFrame.style.display = 'block';
+                errorMsg.style.display = 'none';
+
+            } catch (error) {
+                console.error('Error loading page:', error);
+                showError('Unable to reach this page. Make sure the proxy server is running on localhost:3000');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayContent(html) {
+            contentFrame.textContent = html.substring(0, 50000);
+        }
+
+        function goBack() {
+            if (currentHistoryIndex > 0) {
+                currentHistoryIndex--;
+                const url = browserHistory[currentHistoryIndex];
+                navigateTo(url);
+            }
+        }
+
+        function goForward() {
+            if (currentHistoryIndex < browserHistory.length - 1) {
+                currentHistoryIndex++;
+                const url = browserHistory[currentHistoryIndex];
+                navigateTo(url);
+            }
+        }
+
+        function reloadPage() {
+            if (currentHistoryIndex >= 0 && browserHistory.length > 0) {
+                navigateTo(browserHistory[currentHistoryIndex]);
+            }
+        }
+
+        function goHome() {
+            currentHistoryIndex = -1;
+            browserHistory = [];
+            homepage.style.display = 'flex';
+            contentFrame.style.display = 'none';
+            errorMsg.style.display = 'none';
+            addressBar.value = '';
+            updateNavigationButtons();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                navigateTo(addressBar.value);
+            }
+        }
+
+        function showLoading(show) {
+            loadingSpinner.style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('error-text').textContent = message;
+            errorMsg.style.display = 'block';
+            contentFrame.style.display = 'none';
+            homepage.style.display = 'none';
+        }
+
+        function updateNavigationButtons() {
+            backBtn.disabled = currentHistoryIndex <= 0;
+            forwardBtn.disabled = currentHistoryIndex >= browserHistory.length - 1;
+        }
+
+        function openSettings() {
+            alert('Settings menu (placeholder)');
+        }
+
+        addressBar.focus();
+    </script>
+</body>
+</html>
